@@ -33,15 +33,19 @@ import java.net.URLEncoder;
 import java.util.*;
 
 /**
- * <p>Класс для работы с API Яндекс.Деньги. Реализует интерфейс YandexMoney.</p>
- * <p>За бесопанстость работы с удаленным сервером овечает Apache HttpClient.
- * Он по умолчанию работает в режиме BrowserCompatHostnameVerifier,
- * этот параметр указывает клиенту, что нужно проверять цепочку сертификатов
- * сервера Янедкс.Денег, с которым мы работаем. При этом дополнительно указывать
+ * <p>
+ * Класс для работы с API Яндекс.Деньги. Реализует интерфейс YandexMoney.
+ * </p>
+ * <p>
+ * За бесопанстость работы с удаленным сервером овечает Apache HttpClient. Он по
+ * умолчанию работает в режиме BrowserCompatHostnameVerifier, этот параметр
+ * указывает клиенту, что нужно проверять цепочку сертификатов сервера
+ * Янедкс.Денег, с которым мы работаем. При этом дополнительно указывать
  * сертификат Яндекс.Денег не имеет смысла, так как в java встроено доверие
  * ресурсам сертифицированным официальным CA, таким как GTE CyberTrust
- * Solutions, Inc.</p>
- *
+ * Solutions, Inc.
+ * </p>
+ * 
  * @author dvmelnikov
  */
 
@@ -58,24 +62,28 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
     private static String CHARSET = "UTF-8";
 
     /**
-     * Создает экземпляр класса. Внутри создается httpClient
-     * с SingleClientConnManager и таймаутом 60 секунд. Это для случая когда
+     * Создает экземпляр класса. Внутри создается httpClient с
+     * SingleClientConnManager и таймаутом 60 секунд. Это для случая когда
      * объкту достаточно одного соединения.
-     *
-     * @param clientId идентификатор приложения в системе Яндекс.Деньги
+     * 
+     * @param clientId
+     *            идентификатор приложения в системе Яндекс.Деньги
      */
     public YandexMoneyImpl(final String clientId) {
         this(clientId, new SingleClientConnManager(), null);
     }
 
     /**
-     * Создает экземпляр класса. Внутри создается httpClient
-     * с переданными в параметрах ConnectionManager и HttpParams. Это может
-     * быть нужно для нескольких одновременных соединений.
-     *
-     * @param clientId идентификатор приложения в системе Яндекс.Деньги
-     * @param conman менеджер соединений http-клиента
-     * @param params параметры http-клиента
+     * Создает экземпляр класса. Внутри создается httpClient с переданными в
+     * параметрах ConnectionManager и HttpParams. Это может быть нужно для
+     * нескольких одновременных соединений.
+     * 
+     * @param clientId
+     *            идентификатор приложения в системе Яндекс.Деньги
+     * @param conman
+     *            менеджер соединений http-клиента
+     * @param params
+     *            параметры http-клиента
      */
     public YandexMoneyImpl(final String clientId, ClientConnectionManager conman, HttpParams params) {
         if (clientId == null || (clientId.equals("")))
@@ -89,39 +97,33 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
         client = new DefaultHttpClient(conman, params);
     }
 
-    public String authorizeUri(Collection<Permission> scope,
-            String redirectUri) {
+    public String authorizeUri(Collection<Permission> scope, String redirectUri) {
 
         String sScope = makeScope(scope);
 
         try {
-            return YandexMoney.URI_YM_AUTH + "?client_id=" + clientId +
-                    "&response_type=code" +
-                    "&scope=" + URLEncoder
-                    .encode(sScope, CHARSET) +
-                    "&redirect_uri=" + URLEncoder
-                    .encode(redirectUri, CHARSET);
+            return YandexMoney.URI_YM_AUTH + "?client_id=" + clientId + "&response_type=code" + "&scope="
+                    + URLEncoder.encode(sScope, CHARSET) + "&redirect_uri=" + URLEncoder.encode(redirectUri, CHARSET);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("unsupprorted encoding error", e);
         }
     }
 
-    public ReceiveOAuthTokenResponse receiveOAuthToken(String code,
-            String redirectUri) throws IOException, InsufficientScopeException {
+    public ReceiveOAuthTokenResponse receiveOAuthToken(String code, String redirectUri) throws IOException,
+            InsufficientScopeException {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("grant_type", "authorization_code"));
         params.add(new BasicNameValuePair("client_id", clientId));
         params.add(new BasicNameValuePair("code", code));
         params.add(new BasicNameValuePair("redirect_uri", redirectUri));
 
-        HttpResponse httpResp =
-                execPostRequest(YandexMoney.URI_YM_TOKEN, params, null);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_TOKEN, params, null);
         checkCommonResponse(httpResp);
         return parseJson(httpResp.getEntity(), ReceiveOAuthTokenResponse.class);
     }
 
-    public ReceiveOAuthTokenResponse receiveOAuthToken(String code,
-            String redirectUri, String clientSecret) throws IOException, InsufficientScopeException {
+    public ReceiveOAuthTokenResponse receiveOAuthToken(String code, String redirectUri, String clientSecret)
+            throws IOException, InsufficientScopeException {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("grant_type", "authorization_code"));
         params.add(new BasicNameValuePair("client_id", clientId));
@@ -129,36 +131,31 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
         params.add(new BasicNameValuePair("redirect_uri", redirectUri));
         params.add(new BasicNameValuePair("client_secret", clientSecret));
 
-        HttpResponse httpResp =
-                execPostRequest(YandexMoney.URI_YM_TOKEN, params, null);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_TOKEN, params, null);
         checkCommonResponse(httpResp);
         return parseJson(httpResp.getEntity(), ReceiveOAuthTokenResponse.class);
     }
 
-    public AccountInfoResponse accountInfo(String accessToken)
-            throws IOException, InvalidTokenException, InsufficientScopeException {
-        HttpResponse resp =
-                execPostRequest(YandexMoney.URI_YM_API + "/account-info",
-                        null, accessToken);
+    public AccountInfoResponse accountInfo(String accessToken) throws IOException, InvalidTokenException,
+            InsufficientScopeException {
+        HttpResponse resp = execPostRequest(YandexMoney.URI_YM_API + "/account-info", null, accessToken);
         checkFuncResponse(resp);
         return parseJson(resp.getEntity(), AccountInfoResponse.class);
     }
 
-    public OperationHistoryResponse operationHistory(String accessToken)
-            throws IOException, InvalidTokenException, InsufficientScopeException {
+    public OperationHistoryResponse operationHistory(String accessToken) throws IOException, InvalidTokenException,
+            InsufficientScopeException {
         return operationHistory(accessToken, null, null);
     }
 
-    public OperationHistoryResponse operationHistory(String accessToken,
-            Integer startRecord, Integer records) throws IOException,
-            InvalidTokenException, InsufficientScopeException {
+    public OperationHistoryResponse operationHistory(String accessToken, Integer startRecord, Integer records)
+            throws IOException, InvalidTokenException, InsufficientScopeException {
         return operationHistory(accessToken, startRecord, records, null);
     }
 
-    public OperationHistoryResponse operationHistory(String accessToken,
-            Integer startRecord, Integer records,
-            Set<OperationHistoryType> operationsType) throws IOException,
-            InvalidTokenException, InsufficientScopeException {
+    public OperationHistoryResponse operationHistory(String accessToken, Integer startRecord, Integer records,
+            Set<OperationHistoryType> operationsType) throws IOException, InvalidTokenException,
+            InsufficientScopeException {
 
         String sType = "";
         if (operationsType != null) {
@@ -170,39 +167,30 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         if (startRecord != null)
-            params.add(new BasicNameValuePair("start_record",
-                    String.valueOf(startRecord)));
+            params.add(new BasicNameValuePair("start_record", String.valueOf(startRecord)));
         if (records != null)
-            params.add(
-                    new BasicNameValuePair("records", String.valueOf(records)));
+            params.add(new BasicNameValuePair("records", String.valueOf(records)));
         if (!sType.equals(""))
             params.add(new BasicNameValuePair("type", sType));
 
-        HttpResponse httpResp =
-                execPostRequest(YandexMoney.URI_YM_API + "/operation-history",
-                        params, accessToken);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_API + "/operation-history", params, accessToken);
         checkFuncResponse(httpResp);
         return parseJson(httpResp.getEntity(), OperationHistoryResponse.class);
     }
 
-    public OperationDetailResponse operationDetail(String accessToken,
-            Long operationId) throws IOException, InvalidTokenException,
-            InsufficientScopeException {
+    public OperationDetailResponse operationDetail(String accessToken, Long operationId) throws IOException,
+            InvalidTokenException, InsufficientScopeException {
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("operation_id", Long.toString(operationId)));
 
-        HttpResponse httpResp = execPostRequest(
-                YandexMoney.URI_YM_API + "/operation-details",
-                params, accessToken);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_API + "/operation-details", params, accessToken);
         checkFuncResponse(httpResp);
         return parseJson(httpResp.getEntity(), OperationDetailResponse.class);
     }
 
-    public RequestPaymentResponse requestPaymentP2P(String accessToken,
-            String to, BigDecimal amount, String comment,
-            String message) throws IOException, InvalidTokenException,
-            InsufficientScopeException {
+    public RequestPaymentResponse requestPaymentP2P(String accessToken, String to, BigDecimal amount, String comment,
+            String message) throws IOException, InvalidTokenException, InsufficientScopeException {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("pattern_id", "p2p"));
         params.add(new BasicNameValuePair("to", to));
@@ -210,57 +198,44 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
         params.add(new BasicNameValuePair("comment", comment));
         params.add(new BasicNameValuePair("message", message));
 
-        HttpResponse httpResp =
-                execPostRequest(YandexMoney.URI_YM_API + "/request-payment",
-                        params, accessToken);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_API + "/request-payment", params, accessToken);
         checkFuncResponse(httpResp);
         return parseJson(httpResp.getEntity(), RequestPaymentResponse.class);
     }
 
-    public RequestPaymentResponse requestPaymentShop(String accessToken,
-            String patternId, Map<String, String> params) throws IOException,
-            InvalidTokenException, InsufficientScopeException {
+    public RequestPaymentResponse requestPaymentShop(String accessToken, String patternId, Map<String, String> params)
+            throws IOException, InvalidTokenException, InsufficientScopeException {
 
         List<NameValuePair> pars = new ArrayList<NameValuePair>();
         pars.add(new BasicNameValuePair("pattern_id", patternId));
         for (String name : params.keySet())
             pars.add(new BasicNameValuePair(name, params.get(name)));
 
-        HttpResponse httpResp =
-                execPostRequest(YandexMoney.URI_YM_API + "/request-payment",
-                        pars, accessToken);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_API + "/request-payment", pars, accessToken);
         checkFuncResponse(httpResp);
         return parseJson(httpResp.getEntity(), RequestPaymentResponse.class);
     }
 
-    public ProcessPaymentResponse processPaymentByWallet(String accessToken,
-            String requestId) throws IOException, InsufficientScopeException,
-            InvalidTokenException {
+    public ProcessPaymentResponse processPaymentByWallet(String accessToken, String requestId) throws IOException,
+            InsufficientScopeException, InvalidTokenException {
         return processPayment(accessToken, requestId, MoneySource.wallet, null);
     }
 
-    public ProcessPaymentResponse processPaymentByCard(String accessToken,
-            String requestId, String csc)
-            throws IOException, InsufficientScopeException,
-            InvalidTokenException {
+    public ProcessPaymentResponse processPaymentByCard(String accessToken, String requestId, String csc)
+            throws IOException, InsufficientScopeException, InvalidTokenException {
         return processPayment(accessToken, requestId, MoneySource.card, csc);
     }
 
-    private ProcessPaymentResponse processPayment(String accessToken,
-            String requestId, MoneySource moneySource, String csc)
-            throws IOException, InsufficientScopeException,
-            InvalidTokenException {
+    private ProcessPaymentResponse processPayment(String accessToken, String requestId, MoneySource moneySource,
+            String csc) throws IOException, InsufficientScopeException, InvalidTokenException {
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("request_id", requestId));
-        params.add(
-                new BasicNameValuePair("money_source", moneySource.toString()));
+        params.add(new BasicNameValuePair("money_source", moneySource.toString()));
         if (csc != null && (moneySource.equals(MoneySource.card)))
             params.add(new BasicNameValuePair("csc", csc));
 
-        HttpResponse httpResp =
-                execPostRequest(YandexMoney.URI_YM_API + "/process-payment",
-                        params, accessToken);
+        HttpResponse httpResp = execPostRequest(YandexMoney.URI_YM_API + "/process-payment", params, accessToken);
         checkFuncResponse(httpResp);
         return parseJson(httpResp.getEntity(), ProcessPaymentResponse.class);
     }
@@ -269,13 +244,11 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
         return clientId;
     }
 
-    private HttpResponse execPostRequest(String url, List<NameValuePair> params,
-            String accessToken) throws IOException {
+    private HttpResponse execPostRequest(String url, List<NameValuePair> params, String accessToken) throws IOException {
         HttpPost post = new HttpPost(url);
 
         if (params != null) {
-            post.setEntity(
-                    new UrlEncodedFormEntity(params, CHARSET));
+            post.setEntity(new UrlEncodedFormEntity(params, CHARSET));
         }
 
         if (accessToken != null)
@@ -283,8 +256,8 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
         return client.execute(post);
     }
 
-    private void checkCommonResponse(HttpResponse httpResp) throws
-            InternalServerErrorException, InsufficientScopeException {
+    private void checkCommonResponse(HttpResponse httpResp) throws InternalServerErrorException,
+            InsufficientScopeException {
         int iCode = httpResp.getStatusLine().getStatusCode();
 
         if (iCode == 400)
@@ -298,24 +271,20 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
             throw new IllegalStateException("response http entity is empty");
     }
 
-    private void checkFuncResponse(HttpResponse httpResp) throws
-            InvalidTokenException, InsufficientScopeException,
+    private void checkFuncResponse(HttpResponse httpResp) throws InvalidTokenException, InsufficientScopeException,
             InternalServerErrorException {
         if (httpResp.getStatusLine().getStatusCode() == 401)
             throw new InvalidTokenException("invalid token");
         checkCommonResponse(httpResp);
     }
 
-    private <T> T parseJson(HttpEntity entity, Class<T> classOfT)
-            throws IOException {
+    private <T> T parseJson(HttpEntity entity, Class<T> classOfT) throws IOException {
         InputStream is = entity.getContent();
         try {
             try {
-                Gson gson = new GsonBuilder().setFieldNamingPolicy(
-                        FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-                return gson.fromJson(
-                        new InputStreamReader(is, CHARSET),
-                        classOfT);
+                Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                        .create();
+                return gson.fromJson(new InputStreamReader(is, CHARSET), classOfT);
             } catch (JsonParseException e) {
                 throw new IllegalStateException("response decoding failed", e);
             }
@@ -338,17 +307,21 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
 
         return sBuilder.toString().trim();
     }
-    
-    public OperationIncome notifyIncome(String accessToken, Long lastOperation) throws Exception {
+
+    public OperationIncome notifyIncome(String accessToken, Long lastOperation) {
         while (true) {
             try {
                 return read(accessToken, lastOperation);
             } catch (CollisionException ignore) {
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    OperationIncome read(String token, Long lastOperation) throws CollisionException, Exception {
+    OperationIncome read(String token, Long lastOperation) throws Exception {
         TreeMap<Long, OperationDetailResponse> list = new TreeMap<Long, OperationDetailResponse>();
         Long maxOperation = 0L;
 

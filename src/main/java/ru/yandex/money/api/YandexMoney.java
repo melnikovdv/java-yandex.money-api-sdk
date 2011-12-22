@@ -274,5 +274,5 @@ public interface YandexMoney {
      * 
      * @return  возвращает экземпляр класса {@link OperationIncome}
      */
-    public OperationIncome notifyIncome(String accessToken, Long lastOperation) throws Exception;
+    public OperationIncome notifyIncome(String accessToken, Long lastOperation);
 }
