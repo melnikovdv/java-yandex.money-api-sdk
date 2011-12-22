@@ -1,6 +1,7 @@
 package ru.yandex.money.api.response;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,13 @@ import java.util.Map;
 public class OperationIncome implements Serializable {
     private static final long serialVersionUID = -8037413891091982716L;
 
-    private Collection<OperationDetailResponse> list;
+    private List<OperationDetailResponse> list;
 
     private Long lastOperation;
 
     public OperationIncome(Collection<OperationDetailResponse> list, Long maxOperation) {
         this.lastOperation = maxOperation;
-        this.list = list;
+        this.list = new ArrayList<OperationDetailResponse>(list);
     }
 
     public Long getLastOperation() {
@@ -25,7 +26,7 @@ public class OperationIncome implements Serializable {
         this.lastOperation = lastOperation;
     }
 
-    public Collection<OperationDetailResponse> getList() {
+    public List<OperationDetailResponse> getList() {
         return list;
     }
 
