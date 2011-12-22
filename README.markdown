@@ -70,7 +70,8 @@ Java Yandex.Money API SDK
       codeReqUri = ym.authorizeUri(scope, Consts.REDIRECT_URI);    
       response.sendRedirect(codeReqUri);
 
-      // Затем на странице редиректа выполняем обмен временного кода на постоянный токен доступа
+Затем на странице редиректа выполняем обмен временного кода на постоянный токен доступа
+
       String code = request.getParameter("code");
       ReceiveOAuthTokenResponse resp = ym.receiveOAuthToken(code, Consts.REDIRECT_URI);
       if (resp.isSuccess()) {
