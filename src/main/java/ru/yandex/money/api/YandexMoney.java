@@ -264,4 +264,15 @@ public interface YandexMoney {
      * @return возвращает идентификатор приложения
      */
     public String getClientId();
+    
+    /**
+     * Метод возвращает список входящих операций. Из за огричения протокола, список операций может содеражть
+     * отмененные транзакции.
+     * 
+     * @param accessToken токен авторизации пользователя
+     * @param lastOperation индетификатор последней проверенной операции, может быть  null
+     * 
+     * @return  возвращает экземпляр класса {@link OperationIncome}
+     */
+    public OperationIncome notifyIncome(String accessToken, Long lastOperation) throws Exception;
 }

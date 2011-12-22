@@ -17,9 +17,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+
+import ru.yandex.money.api.enums.MoneyDirection;
 import ru.yandex.money.api.enums.MoneySource;
 import ru.yandex.money.api.enums.OperationHistoryType;
 import ru.yandex.money.api.response.*;
+import ru.yandex.money.api.response.util.Operation;
 import ru.yandex.money.api.rights.AccountInfo;
 import ru.yandex.money.api.rights.OperationHistory;
 import ru.yandex.money.api.rights.Permission;
@@ -335,4 +338,46 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
 
         return sBuilder.toString().trim();
     }
+    
+    public OperationIncome notifyIncome(String accessToken, Long lastOperation) throws Exception {
+        while (true) {
+            try {
+                return read(accessToken, lastOperation);
+            } catch (CollisionException ignore) {
+            }
+        }
+    }
+
+    OperationIncome read(String token, Long lastOperation) throws CollisionException, Exception {
+        TreeMap<Long, OperationDetailResponse> list = new TreeMap<Long, OperationDetailResponse>();
+        Long maxOperation = 0L;
+
+        Integer rowStart = new Integer(0);
+        while (rowStart != null) {
+            OperationHistoryResponse res = operationHistory(token, rowStart, 100);
+
+            if (!res.isSuccess())
+                throw new Exception(res.getError());
+
+            rowStart = res.getNextRecord();
+
+            for (Operation o : res.getOperations()) {
+                Long operationId = o.getOperationId();
+
+                maxOperation = Math.max(operationId, maxOperation);
+
+                if (o.getDirection() == MoneyDirection.in) {
+                    if (operationId.equals(lastOperation))
+                        return new OperationIncome(list.values(), maxOperation);
+                    OperationDetailResponse detail = operationDetail(token, o.getOperationId());
+                    if (list.put(operationId, detail) != null)
+                        throw new CollisionException();
+                }
+            }
+        }
+        if (lastOperation != null)
+            throw new RuntimeException("No last operation found");
+        return new OperationIncome(list.values(), maxOperation);
+    }
+
 }
