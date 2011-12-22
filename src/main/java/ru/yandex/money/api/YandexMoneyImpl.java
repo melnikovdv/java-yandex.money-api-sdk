@@ -183,11 +183,11 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
     }
 
     public OperationDetailResponse operationDetail(String accessToken,
-            String operationId) throws IOException, InvalidTokenException,
+            Long operationId) throws IOException, InvalidTokenException,
             InsufficientScopeException {
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("operation_id", operationId));
+        params.add(new BasicNameValuePair("operation_id", Long.toString(operationId)));
 
         HttpResponse httpResp = execPostRequest(
                 YandexMoney.URI_YM_API + "/operation-details",

@@ -176,7 +176,7 @@ public interface YandexMoney {
      * @throws InternalServerErrorException    техническая ошибка сервера Яндекс.Денег
      */
     public OperationDetailResponse operationDetail(String accessToken,
-            String operationId) throws IOException, InvalidTokenException,
+            Long operationId) throws IOException, InvalidTokenException,
             InsufficientScopeException;
 
     /**

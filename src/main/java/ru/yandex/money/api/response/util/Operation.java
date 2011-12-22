@@ -14,7 +14,7 @@ import java.util.Date;
 public class Operation implements Serializable {
     private static final long serialVersionUID = -8165150792250463801L;
     
-    protected String operationId;
+    protected Long operationId;
     protected String patternId;
     protected MoneyDirection direction;
     protected BigDecimal amount;
@@ -27,7 +27,7 @@ public class Operation implements Serializable {
     /**
      * @return идентификатор операции
      */
-    public String getOperationId() {
+    public Long getOperationId() {
         return operationId;
     }
 
