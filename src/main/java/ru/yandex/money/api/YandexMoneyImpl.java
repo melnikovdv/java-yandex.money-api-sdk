@@ -327,7 +327,7 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
 
         Integer rowStart = new Integer(0);
         while (rowStart != null) {
-            OperationHistoryResponse res = operationHistory(token, rowStart, 100);
+            OperationHistoryResponse res = operationHistory(token, rowStart, 5);
 
             if (!res.isSuccess())
                 throw new Exception(res.getError());
