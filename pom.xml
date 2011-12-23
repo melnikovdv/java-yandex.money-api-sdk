@@ -1,7 +1,8 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>ru.yandex</groupId>
-  <artifactId>ym</artifactId>
+  <artifactId>ympom</artifactId>
+  <name>ympom</name>
   <packaging>pom</packaging>
   <version>1.0</version>
 

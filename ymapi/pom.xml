@@ -4,6 +4,7 @@
   <groupId>ru.yandex</groupId>
   <artifactId>ymapi</artifactId>
   <packaging>jar</packaging>
+  <name>ymapi</name>
   <version>0.0.1-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
 
