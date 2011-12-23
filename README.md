@@ -109,4 +109,4 @@ Java Yandex.Money API SDK
 * `mvn clean package`
 * `cp ymwar/target/ymwar.war /var/lib/tomcat6/webapps`.
 
-Ссылка администирования https://sp-money.yandex.ru/myservices/admin.xml  
+Ссылка администирования приложений: https://sp-money.yandex.ru/myservices/admin.xml. Ссылка для управление доступом приложений: https://sp-money.yandex.ru/myservices/
