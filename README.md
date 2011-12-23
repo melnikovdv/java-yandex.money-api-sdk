@@ -105,6 +105,8 @@ Java Yandex.Money API SDK
 * зарегистрировать приложение, т.е. получить идентификатор клиента (https://sp-money.yandex.ru/myservices/new.xml) и прописать его в константы примеров (src\client\Consts.java);
 * изменить `REDIRECT_URI` (`src/client/Consts.java`), если отличается; 	
 
+Пример сборки maven war файла:
+
     git clone PROJECT_GIT_URL
     cd ymapi
     mvn clean package
