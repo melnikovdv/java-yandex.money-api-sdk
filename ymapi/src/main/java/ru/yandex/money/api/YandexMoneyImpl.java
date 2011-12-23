@@ -308,6 +308,10 @@ public class YandexMoneyImpl implements YandexMoney, Serializable {
         return sBuilder.toString().trim();
     }
 
+    protected static class CollisionException extends Exception {
+        private static final long serialVersionUID = -727297981409385426L;
+    }
+
     public OperationIncome notifyIncome(String accessToken, Long lastOperation) {
         while (true) {
             try {
