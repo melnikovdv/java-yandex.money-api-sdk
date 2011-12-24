@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class InternalServerErrorException extends IOException {
 
+    private static final long serialVersionUID = -2384025387525026987L;
+
     InternalServerErrorException(String s) {
         super(s);
     }

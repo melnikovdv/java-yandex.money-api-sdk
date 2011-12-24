@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class OperationIncome implements Serializable {
     private static final long serialVersionUID = -8037413891091982716L;
