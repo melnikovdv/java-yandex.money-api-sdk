@@ -1,0 +1,27 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ru.yandex</groupId>
+  <artifactId>ympom</artifactId>
+  <name>ympom</name>
+  <packaging>pom</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <modules>
+    <module>ymapi</module>
+    <module>ymwar</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+
